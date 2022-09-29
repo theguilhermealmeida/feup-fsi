@@ -2,8 +2,8 @@
 Breve descrição do grupo
 
 * Turno: [LM]XX
-* Grupo: YY
+* Grupo: l01g09
 * Alunos:
-    - Aluno1 upZZZZZ 
-    - Aluno2 upZZZZZ
-    - Aluno3 upZZZZZ
+    - André Barbosa up202007398 
+    - Guilherme Almeida up202008866
+    - Tiago Barbosa up202004926
