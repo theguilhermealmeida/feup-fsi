@@ -44,7 +44,7 @@ r.interactive()
 
 ```
 
-> The correct flag for challenge 1 was found: 
+> The correct flag for challenge 2 was found: 
 ```
 flag{0e68e08552b7bfe81eb7f7201d81d023}
 ```
