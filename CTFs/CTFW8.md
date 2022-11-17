@@ -84,7 +84,7 @@ int main() {
 >
 > Exploiting gets() we can rewrite the return address to a place in memory where we have a large payload of shellcode and NOPs. If our code jump to the shellcode a shell will be launched and then we can execute:
 
-```bash 
+```bash
 cat flag.txt
 ```
 
