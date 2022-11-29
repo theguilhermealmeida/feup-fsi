@@ -15,13 +15,13 @@
 > ``` sql
 > show tables
 > ```
-> ![show_tables](../docs/show_tables.jpeg)
+> ![show_tables](../docs/logbook8/show_tables.jpeg)
 
 > At the end of this tasks we were asked to print the profile information of the employee Alice, we achieved this by running the folowing command:
 > ``` sql
 > select * from credentials where name = 'Alice'; 
 > ```
-> ![alice](../docs/alice.jpeg)
+> ![alice](../docs/logbook8/alice.jpeg)
 
 ## Task 2: SQL Injection Attack on SELECT Statement
 
@@ -43,10 +43,10 @@ WHERE name= ’$input_uname’ and Password=’$hashed_pwd’";
 >```
 > In the *username* field, we can insert ```admin'#```. This input will firstly close the username string and then comment the rest of the query up until the ```";```. Allowing us to authenticate as the admin without providing a password.  
 > The final query becomes this:
-> ![query](../docs/query.png)
+> ![query](../docs/logbook8/query.png)
 > 
 > After getting access as the administrator we could check the emmployees informations:
-> ![admin](../docs/admin_auth.jpeg)
+> ![admin](../docs/logbook8/admin_auth.jpeg)
 
 ### Task 2.2: SQL Injection Attack from command line
 
@@ -58,7 +58,7 @@ WHERE name= ’$input_uname’ and Password=’$hashed_pwd’";
 >```
 > The **27** and **23** correspond to the ascii code in hexadecimal of the single quote and cardinal sign respectively.
 >
-> ![sql_injection](../docs/sql_injection.jpeg)
+> ![sql_injection](../docs/logbook8/sql_injection.jpeg)
 
 ### Task 2.3: Append a new SQL statement
 
@@ -68,7 +68,7 @@ WHERE name= ’$input_uname’ and Password=’$hashed_pwd’";
 > admin'; DELETE FROM credential WHERE name='Bobby'";#
 >```
 > As expected the following error was raised:
-> ![error](../docs/error.png)
+> ![error](../docs/logbook8/error.png)
 > This is due to a countermeasure implemented in the ```unsafe_home.php ``` file. Basically the MySQLi extension doesn't allow us to perform multiple queries in the database server, due to the possibility of SQL injection.
 
 ## Task 3: SQL Injection Attack on UPDATE Statement
@@ -94,11 +94,11 @@ WHERE ID=$id;";
 > ```
 > Firstly the string mantains Alice's nickname, then the single quote closes the string and then we can insert the salary we want to modify.  
 > In the next picture we can have a more clear image of the final query:
-> ![salary_query](../docs/salary_query.png)
+> ![salary_query](../docs/logbook8/salary_query.png)
 >
 > Final result:
 > 
-> ![salary_modified](../docs/salary_modified.jpeg)
+> ![salary_modified](../docs/logbook8/salary_modified.jpeg)
 
 
 ### Task 3.2: Modify other people’ salary
@@ -109,10 +109,10 @@ WHERE ID=$id;";
 > ',salary='1' where name = 'Bobby';#
 >```
 > Again, to have a better idea of the final query:
-> ![bobby_broke_sql](../docs/bobby_broke_sql.png)
+> ![bobby_broke_sql](../docs/logbook8/bobby_broke_sql.png)
 >
 > In order to check the results we can run the following query in the database:
-> ![bobby_broke](../docs/bobby_broke.jpeg)
+> ![bobby_broke](../docs/logbook8/bobby_broke.jpeg)
 
 ### Aditional task -> Task 3.3: Modify other people’ password.
 
@@ -126,4 +126,4 @@ WHERE ID=$id;";
 >
 > To check the results we run the following query:
 >  
-> ![changed_bobby_pass](../docs/changed_bobby_pass.jpeg)
+> ![changed_bobby_pass](../docs/logbook8/changed_bobby_pass.jpeg)

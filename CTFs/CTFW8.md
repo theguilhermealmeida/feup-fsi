@@ -8,7 +8,7 @@
 
 > First we started by checking <http://ctf-fsi.fe.up.pt:5003/> and explore the page.
 
-![initial page](../docs/initial.png)
+![initial page](../docs/ctf8/initial.png)
 
 > It is a simple web page that allows the user to login inserting a username and a password.
 >
@@ -40,11 +40,11 @@ $query = "SELECT username FROM user WHERE username = '".$username."' AND passwor
 
 > We can insert on the username text to ignore the password and the query will just run to search for the username admin. The text that we will need to insert into the username will be something that will comment the password part like " admin';# " and in the password we can input anything because it will be commented :
 
-![php with our input](../docs/login.png)
+![php with our input](../docs/ctf8/login.png)
 
 > As you can see above, it will just perform a simple query finding a user with the name admin and because it will return that user it will enter the if statement and we will be logged in and able to see the flag:
 
-![after login](../docs/logged_in.png)
+![after login](../docs/ctf8/logged_in.png)
 
 ### Challenge 2
 
