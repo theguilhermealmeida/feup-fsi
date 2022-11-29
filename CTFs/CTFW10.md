@@ -27,7 +27,7 @@
 >
 > Therefore we could exploit this to chain multiple linux commands to access the flag.txt file and get the flag.
 >
-> We started by using ls and cd to navigate through the file system until we found the "flags" folder:
+> Using cat we were able to read the content of the /flags/flag.txt file:
 > ![desafio2](../docs/ctf10/desafio2.png)
 > After submitting:
 > ![flag](../docs/ctf10/desafio2flag.png)
