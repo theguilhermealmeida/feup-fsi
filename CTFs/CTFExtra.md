@@ -113,4 +113,35 @@ p.interactive()
 
 ```bash
 cat flag.txt
-````
+```
+
+## Apply For Flag II
+
+> So in this challenge the XSS possibility was removed because now the admin would go to another page to validate our justification so we couldn´t do an XSS attack like in the week 10 challenge 1 ctf.
+>
+> We first started by analysing the website and we noticed that in the page there was now an id for the request that our justification will use. We assumed that this was going to be important to falsificate an approve request.
+>
+> We then went to see the font code of the new page that the admin would use and we noticed that the give the flag button was connected to a post method to "/request/&{requestid}/approve". So we would need to get the admin to go to this page to approve our request and give the flag.
+>
+> ![giveflag](../docs/ctfextra/giveflaghtml.png)
+>
+> So we find that we would need to realize an CSRF(Cross-site request forgery) to lead the admin to go this page.
+>
+> To achieve this we would need to create a button live the "give the flag" button but in the page where our justifcation go and there with javascript make the admin click that button like we did in week10 challenge 1 ctf.
+> We send this as our justification:
+
+```html
+<form id="form" method="POST" action="http://ctf-fsi.fe.up.pt:5005/request/42fb836522c872ec8986ce0c9aecfa3394b94b61/approve" role="form"><div class="submit"><input type="submit" id="giveflag" value="Give the flag"> </div> </form><script>document.getElementById('giveflag').click()</script>
+```
+
+> We used the id request that was given for us in the page and then when we submitted this and we were redirected to a forbidden page warning so we thought that we did something wrong.
+>
+> ![forbidden](../docs/ctfextra/forbidden.png)
+>
+> This was logical because us, as normal users, were not able to go to this page and when we were redirected to this page by the form we would be blocked. But we knew that the admin would have permissions to go to this page so we would need to disabled the javascript in our page so we wouldn't click on the give the flag button but the admin would have the javascript running and therefore would click on the button and given us the flag.
+>
+> We used uBlockOrigin extension to disable javascript on our browser and then refreshed the page and there it was the flag.
+>
+> ![disablejs](../docs/ctfextra/disablejavascript.png)
+>
+> ![flag](../docs/ctfextra/flag.png)
