@@ -145,3 +145,76 @@ cat flag.txt
 > ![disablejs](../docs/ctfextra/disablejavascript.png)
 >
 > ![flag](../docs/ctfextra/flag.png)
+
+## Number Station 3
+
+> So in this challenge we were presented with some functions related to encryption and decryption using the Advanced Encryption Standard (AES) algorithm.
+>
+> Our goal was to decrypt a message that was encrypted with this algorithm.
+>
+> After analyzing the 3 functions we understood what they did:
+>
+> gen(): This method creates a bytearray object based on a random 16-byte string produced by the os.urandom function, which will be used to construct a random 16-byte binary key. Afterward, iterating over the array of bytes, it sets each byte to the bitwise AND of the initial value and 1 and then returns the bytearray.
+
+```python
+def gen(): 
+	rkey = bytearray(os.urandom(16))
+	for i in range(16): rkey[i] = rkey[i] & 1
+	return bytes(rkey)
+```
+
+> enc(): This function takes a key and a message as inputs and returns the message encrypted using the key and the AES algorithm in Electronic Codebook (ECB) mode. The key and the AES algorithm are used to generate a Cipher object, which is subsequently used to build an encryptor object. The message is then encrypted one character at a time using the update method of the encryptor object. Finally, it invokes the finish function of the encryptor object to return the encrypted message.
+
+```python
+def enc(k, m):
+	cipher = Cipher(algorithms.AES(k), modes.ECB())
+	encryptor = cipher.encryptor()
+	cph = b""
+	for ch in m:
+		cph += encryptor.update((ch*16).encode())
+	cph += encryptor.finalize()
+	return cph
+```
+
+> dec(): This function takes a key and an encrypted message as inputs and returns the decrypted message. It initially verifies that the encrypted message's length is a multiple of 16. (the block size of the AES algorithm). After that, it uses the key and the AES algorithm to build a Cipher object, after which it uses the Cipher object to construct a decryptor object. The encrypted message is then iterated through in blocks of 16 bytes, with each block being decrypted using the update method of the decryptor object. Finally, it invokes the decryptor object's finalize function to return the message that has been decrypted. 
+
+```python
+def dec(k, c):
+	assert len(c) % 16 == 0
+	cipher = Cipher(algorithms.AES(k), modes.ECB())
+	decryptor = cipher.decryptor()
+	blocks = len(c)//16
+	msg = b""
+	for i in range(0,(blocks)):
+		msg+=decryptor.update(c[i*16:(i+1)*16])
+		msg=msg[:-15]
+	msg += decryptor.finalize()
+	return msg
+```
+
+> To decrypt the message we only need to discover the k that was used to encrypt the message. In theory, this would be very difficult because with 16 bytes key it should lead to 2^128 possibilites which is very high to brute force. However when we analyze the code of gen() we know that the key is generated as a 16 bit one because each byte can only be 0 or 1 so the possibilites are only 2^16 which is very easy to brute force.
+>
+> With this in mind we created a python program that would iterate through all possible numbers and transform them into bytearray of 16 bytes and try to decrypt the message with that. We knew that the correct decrypted message would have "flag" in there so:
+
+```python
+c=b'bad11e965230f95179959f44ed4a5acea5d269ac2f00e74707d3a88865df05ad29b5e62cb7a8d313dc7a1e31ba96770a8f4c48484ad7653c48d07f283dac5ef6c8a1173c3741469656e8ab4eca6aadbd6eef87f777fdd889eacdbbaefb720ec28b45adb5868015815b05e37f5fb5d7fe6eef87f777fdd889eacdbbaefb720ec2ac11cc92629b69b0614931c9add007a59b8363d6b92148f197b9938cd7effd04178a2a519f09d799fc1b23bd4afb90bd4b89640e274971a3ad0f4516fdd5231bac11cc92629b69b0614931c9add007a5efed77c652bede2a4428cd602ca00427ac11cc92629b69b0614931c9add007a58583235c834f8e4423a78e99e3985ade9b8363d6b92148f197b9938cd7effd04178a2a519f09d799fc1b23bd4afb90bd8b65375d3570c9eb334b2bc48bbe06e729b5e62cb7a8d313dc7a1e31ba96770a29b5e62cb7a8d313dc7a1e31ba96770a29b5e62cb7a8d313dc7a1e31ba96770a9d0c31394b9e2636144dafc554e623ab29b5e62cb7a8d313dc7a1e31ba96770a178a2a519f09d799fc1b23bd4afb90bd9d0c31394b9e2636144dafc554e623ab7786e9850eddbeebbc0d6239d0c9497b6eef87f777fdd889eacdbbaefb720ec226b00111103d07531431621a86089a42d788b01fbbd0b087e758ae7cbcb09887bad11e965230f95179959f44ed4a5acebad11e965230f95179959f44ed4a5aceac11cc92629b69b0614931c9add007a56eef87f777fdd889eacdbbaefb720ec2c569d016bd92ed9a536c45049450b2289d0c31394b9e2636144dafc554e623ab7786e9850eddbeebbc0d6239d0c9497b9d584baa51918a0029dae1639cdedc53a1cec2c59ce7dd92dea9cd55ac29867f'
+
+for i in range(2 ** 16):
+    binary = bin(i)[2:]  # take the 0b
+    binary = binary.zfill(16)  # make length 16
+    binary_array = [int(ch) for ch in binary]  # convert chars in integers
+    byte_array = bytearray(binary_array)
+    msg = dec(byte_array, unhexlify(c))
+    if b'flag' in msg:
+        print(i)
+        print(msg)
+        break
+```
+
+> We run this program and we got the flag wiht k=32672 :
+
+```bash
+tiagobarbosa05@MacBook-Pro-de-Tiago-2 Downloads % python3 challenge.py
+32672
+b'flag{e5ec82bc1c3824aaa7a276ed9ffce076}\n'
+```
