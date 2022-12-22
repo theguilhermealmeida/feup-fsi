@@ -200,9 +200,9 @@ def dec(k, c):
 c=b'bad11e965230f95179959f44ed4a5acea5d269ac2f00e74707d3a88865df05ad29b5e62cb7a8d313dc7a1e31ba96770a8f4c48484ad7653c48d07f283dac5ef6c8a1173c3741469656e8ab4eca6aadbd6eef87f777fdd889eacdbbaefb720ec28b45adb5868015815b05e37f5fb5d7fe6eef87f777fdd889eacdbbaefb720ec2ac11cc92629b69b0614931c9add007a59b8363d6b92148f197b9938cd7effd04178a2a519f09d799fc1b23bd4afb90bd4b89640e274971a3ad0f4516fdd5231bac11cc92629b69b0614931c9add007a5efed77c652bede2a4428cd602ca00427ac11cc92629b69b0614931c9add007a58583235c834f8e4423a78e99e3985ade9b8363d6b92148f197b9938cd7effd04178a2a519f09d799fc1b23bd4afb90bd8b65375d3570c9eb334b2bc48bbe06e729b5e62cb7a8d313dc7a1e31ba96770a29b5e62cb7a8d313dc7a1e31ba96770a29b5e62cb7a8d313dc7a1e31ba96770a9d0c31394b9e2636144dafc554e623ab29b5e62cb7a8d313dc7a1e31ba96770a178a2a519f09d799fc1b23bd4afb90bd9d0c31394b9e2636144dafc554e623ab7786e9850eddbeebbc0d6239d0c9497b6eef87f777fdd889eacdbbaefb720ec226b00111103d07531431621a86089a42d788b01fbbd0b087e758ae7cbcb09887bad11e965230f95179959f44ed4a5acebad11e965230f95179959f44ed4a5aceac11cc92629b69b0614931c9add007a56eef87f777fdd889eacdbbaefb720ec2c569d016bd92ed9a536c45049450b2289d0c31394b9e2636144dafc554e623ab7786e9850eddbeebbc0d6239d0c9497b9d584baa51918a0029dae1639cdedc53a1cec2c59ce7dd92dea9cd55ac29867f'
 
 for i in range(2 ** 16):
-    binary = bin(i)[2:]  # take the 0b
-    binary = binary.zfill(16)  # make length 16
-    binary_array = [int(ch) for ch in binary]  # convert chars in integers
+    binary_string = bin(i)[2:]  # take the 0b
+    binary_string = binary_string.zfill(16)  # make length 16
+    binary_array = [int(ch) for ch in binary_string]  # convert chars in integers
     byte_array = bytearray(binary_array)
     msg = dec(byte_array, unhexlify(c))
     if b'flag' in msg:
