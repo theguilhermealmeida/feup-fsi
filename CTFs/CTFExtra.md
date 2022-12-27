@@ -309,3 +309,4 @@ p.interactive()
 ```
 
 > After this we got access to a shell and successfully got the flag.
+> ![flag](../docs/ctfextra/echo.png)
