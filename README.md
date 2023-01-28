@@ -1,7 +1,4 @@
-
-Breve descrição do grupo
-
-* Turno: [LM]XX
+# FSI
 * Grupo: l01g09
 * Alunos:
     - André Barbosa up202007398 
